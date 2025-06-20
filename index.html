@@ -116,22 +116,20 @@
       document.querySelectorAll(".question-section")[0].style.display = "block";
     }
 
-    function sendResponsesToSheet() {
-      if (responses.length === 0) {
-        alert("No responses recorded.");
-        return;
-      }
-const url = "https://script.google.com/macros/s/AKfycbwxYLCggbiCkN61UaJaSVLv7tyGcCxoqzUpsbBZVyBq-YF8RlK6755F5QIboD7u8JTCJw/exec";
-const encoded = encodeURIComponent(JSON.stringify(responses));
-fetch(`${url}?data=${encoded}`)
-  .then(res => res.text())
-  .then(res => alert("Your responses have been submitted. Thank you!"))
-  .catch(err => alert("Error submitting responses. Please try again."));
-        .then((res) => res.text())
-        .then((res) => alert("Your responses have been submitted. Thank you!"))
-        .catch((err) => alert("Error submitting responses. Please try again."));
-    }
+function sendResponsesToSheet() {
+  if (responses.length === 0) {
+    alert("No responses recorded.");
+    return;
+  }
 
+  const url = "https://script.google.com/macros/s/AKfycbwxYLCggbiCkN61UaJaSVLv7tyGcCxoqzUpsbBZVyBq-YF8RlK6755F5QIboD7u8JTCJw/exec";
+  const encoded = encodeURIComponent(JSON.stringify(responses));
+
+  fetch(`${url}?data=${encoded}`)
+    .then(res => res.text())
+    .then(res => alert("Your responses have been submitted. Thank you!"))
+    .catch(err => alert("Error submitting responses. Please try again."));
+}
     const questions = [
   {
     title: "Question 1",
