@@ -1,60 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Decision-Making Test</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 600px;
-            margin: 20px auto;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 10px 5px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s;
-            width: 100%;
-            max-width: 300px;
-            box-sizing: border-box;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        button:active {
-            background-color: #003d80;
-        }
-        input {
-            padding: 10px;
-            width: 100%;
-            margin-top: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .question-section {
-            display: none;
-        }
-        @media screen and (max-width: 600px) {
-            button {
-                font-size: 16px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decision-Making Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+      margin: 20px auto;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px 5px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s;
+      width: 100%;
+      max-width: 300px;
+      box-sizing: border-box;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    button:active {
+      background-color: #003d80;
+    }
+    input {
+      padding: 10px;
+      width: 100%;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    .question-section {
+      display: none;
+    }
+    @media screen and (max-width: 600px) {
+      button {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="start-section">
+    <h2>Decision-Making Test</h2>
+    <label for="participantName">Enter your name:</label>
+    <input type="text" id="participantName" placeholder="Your name" />
+    <button onclick="startQuiz()">Start Quiz</button>
+  </div>ple
+
+  <div class="container" id="end-section" style="display: none">
+    <h2>Test Completed</h2>
+    <button onclick="sendResponsesToSheet()">Submit Responses</button>
+  </div>
+
+  <script>
+    let startTime;
+    let responses = [];
+    let currentQuestion = 0;
+
+    function startTimer(question, button) {
+      startTime = Date.now();
+      button.style.display = "none";
+      button.nextElementSibling.style.display = "block";
+    }
+
+    function recordResponse(question, answer, button) {
+      if (!startTime) {
+        alert("Please start the timer first.");
+        return;
+      }
+      let responseTime = Date.now() - startTime;
+      let name = document.getElementById("participantName").value;
+      if (!name) {
+        alert("Please enter your name first.");
+        return;
+      }
+      responses.push({ name: name, question: question, answer: answer, time: `${responseTime}ms` });
+      startTime = null;
+      button.style.backgroundColor = "#28a745";
+      setTimeout(() => nextQuestion(), 500);
+    }
+
+    function nextQuestion() {
+      let sections = document.querySelectorAll(".question-section");
+      sections[currentQuestion].style.display = "none";
+      currentQuestion++;
+      if (currentQuestion < sections.length) {
+        sections[currentQuestion].style.display = "block";
+      } else {
+        document.getElementById("end-section").style.display = "block";
+      }
+    }
+
+    function startQuiz() {
+      document.getElementById("start-section").style.display = "none";
+      document.querySelectorAll(".question-section")[0].style.display = "block";
+    }
+
+    function sendResponsesToSheet() {
+      if (responses.length === 0) {
+        alert("No responses recorded.");
+        return;
+      }
+      fetch("https://script.google.com/macros/s/AKfycbwxYLCggbiCkN61UaJaSVLv7tyGcCxoqzUpsbBZVyBq-YF8RlK6755F5QIboD7u8JTCJw/exec", {
+        method: "POST",
+        body: JSON.stringify(responses),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.text())
+        .then((res) => alert("Your responses have been submitted. Thank you!"))
+        .catch((err) => alert("Error submitting responses. Please try again."));
+    }
+
+    const questions = [
+  {
+    title: "Question 1",
+    label: "Would you break her trust and report it?",
+    prompt: "Anda seorang guru dan secara tidak sengaja telah terbaca catatan peribadi pelajar yang mengandungi pengakuan untuk mencederakan dirinya. Pelajar itu merayu supaya anda tidak memberitahu sesiapa, dengan alasan dia sedang mencuba yang terbaik.<br><br><strong>Adakah anda akan mengkhianati kepercayaannya dan melaporkannya?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 2",
+    label: "Would you confront them?",
+    prompt: "You bring your partner to meet your parents for the first time. You went to the kitchen to fetch some drinks, on your walk back to the living room, you catch your parents discriminating against your partner due to race. Confronting may cause family rift.<br><br><strong>Would you confront them?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 3",
+    label: "Adakah anda akan melaporkannya?",
+    prompt: "Anda merupakan seorang pengurus di sebuah pasaraya. Seorang pengawal keselamatan melaporkan yang seorang pelarian Rohingya telah mencuri makanan kerana keluarganya kelaparan. Melaporkannya boleh melindungi hak milik tetapi akan menambah penderitaan pelarian tersebut.<br><br><strong>Adakah anda akan melaporkannya?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 4",
+    label: "Would you report the wrongdoing?",
+    prompt: "During a volunteer trip, you see food rations being misallocated by local officials. Reporting it could ensure fairness but also offend your hosts and damage international relations.<br><br><strong>Would you report the wrongdoing?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 5",
+    label: "Would you give them the scholarship anyway?",
+    prompt: "You run a scholarship fund and discover that the most deserving applicant is undocumented. Granting it to them could lead to backlash from donors.<br><br><strong>Would you give them the scholarship anyway?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 6",
+    label: "Adakah anda akan membantunya?",
+    prompt: "Anda seorang jururawat di sebuah hospital kerajaan. Seorang pesakit yang menghidap penyakit kanser tahap 4 merayu supaya anda membantu mengakhiri penderitaannya. Eutanasia adalah salah di sisi undang-undang, tetapi pesakit itu sedang kesakitan dan sudah putus asa.<br><br><strong>Adakah anda akan membantunya?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 7",
+    label: "Would you report him?",
+    prompt: "A retired police officer (your father) admits to covering up a crime years ago to protect a friend. Reporting him could exonerate an innocent man, but your father may be jailed.<br><br><strong>Would you report him?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 8",
+    label: "Adakah anda akan menyiarkan rakaman tersebut?",
+    prompt: "Anda merupakan seorang wartawan jenayah yang menginginkan kenaikan tangga gaji. Pada suatu hari, anda merupakan orang yang pertama tiba di tempat kejadian kemalangan tragis. Anda mempunyai rakaman asli yang menunjukkan orang yang menderita dan hampir meninggal dunia. Menerbitkan rakaman itu akan membuatkan ramai membaca laporan anda namun ianya akan menyebabkan kesedihan mendalam kepada keluarga mangsa kerana tidak menjaga sensitiviti mereka.<br><br><strong>Adakah anda akan menyiarkan rakaman tersebut?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 9",
+    label: "Would you report them?",
+    prompt: "You are a supermarket manager. A security officer reported a Rohingya refugee steals food because their family is starving. Turning them in could protect property rights but worsen the refugee’s suffering.<br><br><strong>Would you report them?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 10",
+    label: "Adakah anda akan memberikan biasiswa itu juga?",
+    prompt: "Anda menguruskan dana biasiswa dan mendapati pemohon yang paling layak tidak mempunyai dokumen sah. Memberi biasiswa kepadanya mungkin menimbulkan reaksi negatif daripada penderma.<br><br><strong>Adakah anda akan memberikan biasiswa itu juga?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 11",
+    label: "Would you release the vaccine early?",
+    prompt: "You are a scientist during a deadly pandemic. A vaccine trial shows promise but lacks final testing. Releasing it now could save millions or risk unknown side effects.<br><br><strong>Would you release the vaccine early?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 12",
+    label: "Adakah anda akan membenarkannya?",
+    prompt: "Anda sedang memohon pekerjaan selama beberapa bulan namun tidak membuahkan hasil. Seorang rakan menawarkan untuk “memperbaiki” resume anda dengan pengalaman yang dibesar-besarkan. Tiada siapa yang akan tahu, tetapi ia adalah perbuatan yang tidak jujur.<br><br><strong>Adakah anda akan membenarkannya?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 13",
+    label: "Would you post the footage?",
+    prompt: "You are a journalist who arrives first at the scene of a tragic accident. You have raw footage showing people suffering and on the verge of death. Publishing it would inform the public but cause great distress to the victims' families.<br><br><strong>Would you post the footage?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 14",
+    label: "Adakah anda akan melaporkannya?",
+    prompt: "Ayah anda, yang merupakan seorang bekas anggota Polis Di-Raja Malaysia (PDRM), mengaku telah menutup kes jenayah beberapa tahun lalu demi melindungi seorang rakan. Melaporkan perkara ini boleh membebaskan seorang yang tidak bersalah, tetapi ayah anda mungkin akan dipenjara.<br><br><strong>Adakah anda akan melaporkannya?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 15",
+    label: "Would you let them do it?",
+    prompt: "You are applying for a job and a friend offers to “improve” your resume with exaggerated experience. No one would know, but it is dishonest.<br><br><strong>Would you let them do it?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 16",
+    label: "Adakah anda akan menegur ibu bapa anda?",
+    prompt: "Anda membawa pasangan anda berjumpa dengan ibu bapa anda di rumah. Anda ke dapur untuk mengambil air, dan semasa dalam perjalanan menuju ke ruang tamu, anda terdengar ibu bapa anda mendiskriminasi pasangan anda atas sebab perkauman. Menegur ibu bapa anda mungkin akan menyebabkan perpecahan dalam keluarga.<br><br><strong>Adakah anda akan menegur ibu bapa anda?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 17",
+    label: "Would you help him?",
+    prompt: "You are a nurse at a government hospital. A terminally ill Stage 4 cancer patient begs you to help end his suffering. Euthanasia is illegal, but the patient is in pain and desperate.<br><br><strong>Would you help him?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 18",
+    label: "Adakah anda akan melaporkan kesalahan itu?",
+    prompt: "Semasa program sukarelawan, anda melihat bantuan makanan diagihkan secara tidak adil oleh pegawai tempatan. Melaporkannya boleh memastikan keadilan tetapi juga mungkin menyinggung tuan rumah dan merosakkan hubungan antarabangsa.<br><br><strong>Adakah anda akan melaporkan kesalahan itu?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 19",
+    label: "Adakah anda akan mengeluarkan vaksin tersebut lebih awal?",
+    prompt: "Anda seorang saintis semasa wabak maut. Ujian vaksin menunjukkan hasil yang memberangsangkan tetapi masih belum selesai ujian akhir. Mengeluarkannya sekarang boleh menyelamatkan berjuta-juta nyawa atau menimbulkan risiko kesan sampingan yang tidak diketahui.<br><br><strong>Adakah anda akan mengeluarkan vaksin tersebut lebih awal?</strong>",
+    options: ["Yes", "No"]
+  },
+  {
+    title: "Question 20",
+    label: "Would you break her trust and report it?",
+    prompt: "You are a teacher and accidentally see a student's journal describing thoughts of self-harm. The student begs you not to tell anyone, saying she is handling it.<br><br><strong>Would you break her trust and report it?</strong>",
+    options: ["Yes", "No"]
+  }
+];
+
+    const container = document.body;
+    questions.forEach((q, index) => {
+      const div = document.createElement("div");
+      div.className = "container question-section";
+      div.id = `question-${index + 1}`;
+      div.innerHTML = `
+        <h3>${q.title}</h3>
+        <button onclick="startTimer('${q.label}', this)">Start Question</button>
+        <div style="display:none;">
+          <p>${q.prompt}</p>
+          ${q.options
+            .map(
+              (opt) =>
+                `<button onclick="recordResponse('${q.label}', '${opt}', this)">${opt}</button>`
+            )
+            .join("")}
+        </div>
+      `;
+      container.insertBefore(div, document.getElementById("end-section"));
+    });
+  </script>
+</body>
+</html>
