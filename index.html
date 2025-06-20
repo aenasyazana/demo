@@ -121,13 +121,12 @@
         alert("No responses recorded.");
         return;
       }
-      fetch("https://script.google.com/macros/s/AKfycbwxYLCggbiCkN61UaJaSVLv7tyGcCxoqzUpsbBZVyBq-YF8RlK6755F5QIboD7u8JTCJw/exec", {
-        method: "POST",
-        body: JSON.stringify(responses),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+const url = "https://script.google.com/macros/s/AKfycbwxYLCggbiCkN61UaJaSVLv7tyGcCxoqzUpsbBZVyBq-YF8RlK6755F5QIboD7u8JTCJw/exec";
+const encoded = encodeURIComponent(JSON.stringify(responses));
+fetch(`${url}?data=${encoded}`)
+  .then(res => res.text())
+  .then(res => alert("Your responses have been submitted. Thank you!"))
+  .catch(err => alert("Error submitting responses. Please try again."));
         .then((res) => res.text())
         .then((res) => alert("Your responses have been submitted. Thank you!"))
         .catch((err) => alert("Error submitting responses. Please try again."));
