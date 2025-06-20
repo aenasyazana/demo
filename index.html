@@ -9,29 +9,31 @@
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f4f4f4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             margin: 0;
+            padding: 0;
         }
         .container {
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 50%;
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+            box-sizing: border-box;
         }
         button {
             background-color: #007bff;
             color: white;
             border: none;
             padding: 10px 20px;
-            margin: 10px;
+            margin: 10px 5px;
             cursor: pointer;
             border-radius: 5px;
             transition: background 0.3s;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
         }
         button:hover {
             background-color: #0056b3;
@@ -41,107 +43,18 @@
         }
         input {
             padding: 10px;
-            width: 80%;
+            width: 100%;
             margin-top: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            box-sizing: border-box;
         }
         .question-section {
             display: none;
         }
+        @media screen and (max-width: 600px) {
+            button {
+                font-size: 16px;
+            }
+        }
     </style>
-    <script>
-        let startTime;
-        let responses = [];
-        let currentQuestion = 0;
-
-        function startTimer(question, button) {
-            startTime = Date.now();
-            console.log(`Timer started for: ${question}`);
-            button.style.display = "none";
-            button.nextElementSibling.style.display = "block";
-        }
-
-        function recordResponse(question, answer, button) {
-            if (!startTime) {
-                alert("Please start the timer first.");
-                return;
-            }
-            let responseTime = Date.now() - startTime;
-            let name = document.getElementById("participantName").value;
-            if (!name) {
-                alert("Please enter your name first.");
-                return;
-            }
-            responses.push(`${name},${question},${answer},${responseTime}ms`);
-            startTime = null;
-            button.style.backgroundColor = "#28a745";
-            setTimeout(() => nextQuestion(), 500);
-        }
-
-        function nextQuestion() {
-            let sections = document.querySelectorAll(".question-section");
-            sections[currentQuestion].style.display = "none";
-            currentQuestion++;
-            if (currentQuestion < sections.length) {
-                sections[currentQuestion].style.display = "block";
-            } else {
-                document.getElementById("end-section").style.display = "block";
-            }
-        }
-
-        function startQuiz() {
-            document.getElementById("start-section").style.display = "none";
-            document.getElementById("question-1").style.display = "block";
-        }
-
-        function downloadCSV() {
-            if (responses.length === 0) {
-                alert("No responses recorded.");
-                return;
-            }
-            let csvContent = "Name,Question,Answer,Response Time\n" + responses.join("\n");
-            let blob = new Blob([csvContent], { type: 'text/csv' });
-            let a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "response_data.csv";
-            a.click();
-        }
-    </script>
-</head>
-<body>
-    <div class="container" id="start-section">
-        <h2>Decision-Making Test</h2>
-        <label for="participantName">Enter your name:</label>
-        <input type="text" id="participantName" placeholder="Your name">
-        <button onclick="startQuiz()">Start Quiz</button>
-    </div>
-
-    <div class="container question-section" id="question-1">
-        <h3>Question 1</h3>
-        <button onclick="startTimer('Lost Wallet', this)">Start Question</button>
-        <div style="display:none;">
-            <p>What would you do if you found a lost wallet?</p>
-            <button onclick="recordResponse('Lost Wallet', 'Return to owner', this)">Return to owner</button>
-            <button onclick="recordResponse('Lost Wallet', 'Keep it', this)">Keep it</button>
-            <button onclick="recordResponse('Lost Wallet', 'Ignore it', this)">Ignore it</button>
-        </div>
-    </div>
-
-    <div class="container question-section" id="question-2">
-        <h3>Question 2</h3>
-        <button onclick="startTimer('Anak Kucing Terbiar', this)">Start Question</button>
-        <div style="display:none;">
-            <p>Apakah tindakan anda jika anda terlihat seekor anak kucing terbiar?</p>
-            <button onclick="recordResponse('Anak Kucing Terbiar', 'Ambil dan jaga', this)">Ambil dan jaga</button>
-            <button onclick="recordResponse('Anak Kucing Terbiar', 'Biarkan sahaja', this)">Biarkan sahaja</button>
-            <button onclick="recordResponse('Anak Kucing Terbiar', 'Hubungi pusat penyelamat', this)">Hubungi pusat penyelamat</button>
-        </div>
-    </div>
-
-    <div class="container" id="end-section" style="display:none;">
-        <h2>Test Completed</h2>
-        <button onclick="downloadCSV()">Download Responses</button>
-    </div>
-</body>
-</html>
